@@ -24,6 +24,7 @@ contract AppWorks is ERC721, Ownable {
     bool public revealed = false;
 
     string public baseURI;
+    string public blindURI;
     bytes32 public merkleRoot;
 
     mapping(uint256 => string) private _tokenURIs;
@@ -98,6 +99,17 @@ contract AppWorks is ERC721, Ownable {
     // Function to return the base URI
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        _requireMinted(tokenId);
+
+        if (revealed){
+            string memory _URI = _baseURI();
+            return bytes(_URI).length > 0 ? string(abi.encodePacked(_URI, tokenId.toString())) : "";
+        }else{
+            return blindURI;
+        }
     }
 
     // Early mint function for people on the whitelist - week 9
